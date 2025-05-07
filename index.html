@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Auryn Search - Snowdev</title>
+   <!-- Add the favicon link -->
+   <link rel="icon" href="https://iili.io/3OpKJKQ.png" type="image/png" />
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: url('https://iili.io/3ODmFTB.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
+
+    form {
+      width: 90%;
+      max-width: 400px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      height: 45px;
+      padding: 0 20px;
+      font-size: 18px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      backdrop-filter: blur(10px) saturate(180%);
+      -webkit-backdrop-filter: blur(10px) saturate(180%);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+      outline: none;
+      transition: box-shadow 0.4s ease, border 0.4s ease;
+    }
+
+    input[type="text"]::placeholder {
+      color: white;
+      opacity: 0.6;
+    }
+
+    .pulse-effect {
+      animation: pulse 0.4s ease-out;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.6);
+      }
+      100% {
+        box-shadow: 0 0 15px 6px rgba(66, 133, 244, 0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <form id="searchForm" action="https://www.google.com/search" method="get">
+    <input id="searchInput" type="text" name="q" placeholder="Type something..." required />
+  </form>
+
+  <!-- Typing sound -->
+  <audio id="typeSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_d91cdd4a37.mp3?filename=typewriter-key-1-112233.mp3" preload="auto"></audio>
+
+  <script>
+    const input = document.getElementById("searchInput");
+    const form = document.getElementById("searchForm");
+    const typeSound = document.getElementById("typeSound");
+
+    let canPlaySound = false;
+    window.addEventListener("click", () => canPlaySound = true, { once: true });
+
+    let typingTimeout;
+
+    input.addEventListener("input", () => {
+      clearTimeout(typingTimeout);
+
+      typingTimeout = setTimeout(() => {
+        input.classList.remove("pulse-effect"); // Reset animation
+        void input.offsetWidth; // Reflow hack to restart CSS animation
+        input.classList.add("pulse-effect");
+
+        if (canPlaySound) {
+          typeSound.currentTime = 0;
+          typeSound.play().catch(() => {});
+        }
+      }, 60); // Slight delay to simulate natural typing rhythm
+    });
+
+    // Check for URL query parameter and perform the search
+    const urlParams = new URLSearchParams(window.location.search);
+    const query = urlParams.get('q');  // Look for the "q" parameter
+
+    if (query) {
+      // Set the input value and trigger the search automatically
+      input.value = query;
+      form.submit();  // Automatically submit the form to Google
+    }
+  </script>
+</body>
+</html>
