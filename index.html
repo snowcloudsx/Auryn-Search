@@ -59,6 +59,7 @@
       z-index: 9999;
       display: none;
       overflow-y: auto;
+      max-height: 300px;
     }
 
     .suggestion-item {
@@ -79,6 +80,171 @@
       color: rgba(255, 255, 255, 0.6);
       font-size: 0.8em;
     }
+
+    /* Settings Popup Styles */
+    .settings-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    .settings-content {
+      background-color: rgba(30, 30, 30, 0.9);
+      padding: 25px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      color: white;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 10px;
+    }
+
+    .settings-title {
+      font-size: 24px;
+      margin: 0;
+    }
+
+    .close-settings {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    .setting-item {
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .setting-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .setting-name {
+      font-size: 16px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #4285F4;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    /* No blur effect class */
+    .no-blur {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    /* Light mode styles */
+    body.light-mode {
+      color: #333;
+    }
+
+    body.light-mode input[type="text"] {
+      background: rgba(255, 255, 255, 0.8);
+      color: #333;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    body.light-mode input[type="text"]::placeholder {
+      color: #666;
+    }
+
+    body.light-mode #autocomplete-suggestions {
+      background-color: rgba(255, 255, 255, 0.9);
+      color: #333;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    body.light-mode .suggestion-item {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    body.light-mode .search-count {
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    body.light-mode .settings-content {
+      background-color: rgba(255, 255, 255, 0.95);
+      color: #333;
+    }
+
+    body.light-mode .settings-header {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    body.light-mode .setting-item {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    body.light-mode .close-settings {
+      color: #333;
+    }
   </style>
 </head>
 <body>
@@ -87,10 +253,111 @@
     <div id="autocomplete-suggestions"></div>
   </form>
 
+  <!-- Settings Popup -->
+  <div class="settings-popup" id="settingsPopup">
+    <div class="settings-content">
+      <div class="settings-header">
+        <h2 class="settings-title">Settings</h2>
+        <button class="close-settings" id="closeSettings">&times;</button>
+      </div>
+      
+      <div class="setting-item">
+        <div class="setting-label">
+          <span class="setting-name">Dark Mode</span>
+          <label class="switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <p class="setting-description">Toggle between dark and light mode</p>
+      </div>
+      
+      <div class="setting-item">
+        <div class="setting-label">
+          <span class="setting-name">Search Suggestions</span>
+          <label class="switch">
+            <input type="checkbox" id="suggestionsToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <p class="setting-description">Enable or disable search suggestions</p>
+      </div>
+      
+      <div class="setting-item">
+        <div class="setting-label">
+          <span class="setting-name">History Tracking</span>
+          <label class="switch">
+            <input type="checkbox" id="historyToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <p class="setting-description">Allow the search to remember your queries</p>
+      </div>
+      
+      <div class="setting-item">
+        <div class="setting-label">
+          <span class="setting-name">Blur Effect</span>
+          <label class="switch">
+            <input type="checkbox" id="blurToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <p class="setting-description">Enable background blur effects</p>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // DOM Elements
     const input = document.getElementById("searchInput");
     const form = document.getElementById("searchForm");
     const suggestionsBox = document.getElementById("autocomplete-suggestions");
+    const settingsPopup = document.getElementById("settingsPopup");
+    const closeSettings = document.getElementById("closeSettings");
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    const suggestionsToggle = document.getElementById("suggestionsToggle");
+    const historyToggle = document.getElementById("historyToggle");
+    const blurToggle = document.getElementById("blurToggle");
+
+    // Initialize settings from localStorage or defaults
+    const settings = JSON.parse(localStorage.getItem("searchSettings")) || {
+      darkMode: true,
+      suggestions: true,
+      history: true,
+      blur: true
+    };
+
+    // Apply settings on page load
+    function applySettings() {
+      // Dark Mode
+      if (settings.darkMode) {
+        document.body.classList.remove("light-mode");
+      } else {
+        document.body.classList.add("light-mode");
+      }
+      darkModeToggle.checked = settings.darkMode;
+
+      // Suggestions
+      suggestionsToggle.checked = settings.suggestions;
+      if (!settings.suggestions) {
+        suggestionsBox.style.display = "none";
+      }
+
+      // History
+      historyToggle.checked = settings.history;
+
+      // Blur Effect
+      blurToggle.checked = settings.blur;
+      if (settings.blur) {
+        document.body.classList.remove("no-blur");
+        input.classList.remove("no-blur");
+        settingsPopup.classList.remove("no-blur");
+      } else {
+        document.body.classList.add("no-blur");
+        input.classList.add("no-blur");
+        settingsPopup.classList.add("no-blur");
+      }
+    }
 
     // Initialize with some example searches (5+ times)
     let searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || {
@@ -98,20 +365,31 @@
       "news": 12,
       "sports": 9,
       "movies": 5,
-      "google": 10
+      "google": 10,
+      "snow/settings": 3
     };
 
+    // Track selected suggestion with arrow keys
+    let selectedSuggestionIndex = -1;
+    let currentSuggestions = [];
+
     function updateSuggestions(query) {
+      if (!settings.suggestions) {
+        suggestionsBox.style.display = "none";
+        return;
+      }
+
       suggestionsBox.innerHTML = "";
+      selectedSuggestionIndex = -1;
       
-      const suggestions = Object.entries(searchHistory)
+      currentSuggestions = Object.entries(searchHistory)
         .filter(([term, count]) => 
           term.toLowerCase().includes(query.toLowerCase()) && count >= 3
         )
         .sort((a, b) => b[1] - a[1]);
 
-      if (suggestions.length > 0 && query.length > 0) {
-        suggestions.forEach(([term, count]) => {
+      if (currentSuggestions.length > 0 && query.length > 0) {
+        currentSuggestions.forEach(([term, count], index) => {
           const suggestionItem = document.createElement("div");
           suggestionItem.classList.add("suggestion-item");
           suggestionItem.innerHTML = `
@@ -136,10 +414,88 @@
       updateSuggestions(this.value.trim());
     });
 
+    // Handle keyboard navigation for suggestions
+    input.addEventListener("keydown", function(e) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (selectedSuggestionIndex < currentSuggestions.length - 1) {
+          selectedSuggestionIndex++;
+          highlightSuggestion();
+        }
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (selectedSuggestionIndex > 0) {
+          selectedSuggestionIndex--;
+          highlightSuggestion();
+        } else if (selectedSuggestionIndex === 0) {
+          selectedSuggestionIndex = -1;
+          highlightSuggestion();
+        }
+      } else if (e.key === "Tab" && currentSuggestions.length > 0 && selectedSuggestionIndex === -1) {
+        e.preventDefault();
+        selectedSuggestionIndex = 0;
+        input.value = currentSuggestions[0][0];
+        suggestionsBox.style.display = "none";
+      } else if (e.key === "Enter" && selectedSuggestionIndex >= 0) {
+        e.preventDefault();
+        input.value = currentSuggestions[selectedSuggestionIndex][0];
+        suggestionsBox.style.display = "none";
+        form.dispatchEvent(new Event('submit', { cancelable: true }));
+      }
+    });
+
+    function highlightSuggestion() {
+      const suggestions = suggestionsBox.querySelectorAll(".suggestion-item");
+      suggestions.forEach((item, index) => {
+        if (index === selectedSuggestionIndex) {
+          item.style.background = "rgba(66, 133, 244, 0.6)";
+          item.style.paddingLeft = "15px";
+        } else {
+          item.style.background = "";
+          item.style.paddingLeft = "10px";
+        }
+      });
+    }
+
     document.addEventListener("click", function(e) {
       if (!form.contains(e.target)) {
         suggestionsBox.style.display = "none";
       }
+    });
+
+    // Settings functionality
+    closeSettings.addEventListener("click", function() {
+      settingsPopup.style.display = "none";
+    });
+
+    // Toggle handlers
+    darkModeToggle.addEventListener("change", function() {
+      settings.darkMode = this.checked;
+      localStorage.setItem("searchSettings", JSON.stringify(settings));
+      applySettings();
+    });
+
+    suggestionsToggle.addEventListener("change", function() {
+      settings.suggestions = this.checked;
+      localStorage.setItem("searchSettings", JSON.stringify(settings));
+      if (!this.checked) {
+        suggestionsBox.style.display = "none";
+      }
+    });
+
+    historyToggle.addEventListener("change", function() {
+      settings.history = this.checked;
+      localStorage.setItem("searchSettings", JSON.stringify(settings));
+      if (!this.checked) {
+        searchHistory = {};
+        localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+      }
+    });
+
+    blurToggle.addEventListener("change", function() {
+      settings.blur = this.checked;
+      localStorage.setItem("searchSettings", JSON.stringify(settings));
+      applySettings();
     });
 
     form.addEventListener("submit", function(e) {
@@ -148,9 +504,18 @@
 
       if (!userInput) return;
 
-      // Update search count
-      searchHistory[userInput] = (searchHistory[userInput] || 0) + 1;
-      localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+      // Check for special commands
+      if (userInput.toLowerCase() === "snow/settings" || userInput.toLowerCase() === "snowdev/settings") {
+        settingsPopup.style.display = "flex";
+        input.value = "";
+        return;
+      }
+
+      // Update search count if history is enabled
+      if (settings.history) {
+        searchHistory[userInput] = (searchHistory[userInput] || 0) + 1;
+        localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+      }
 
       if (userInput.toLowerCase().includes("snowdev")) {
         // Special case for snowdev
@@ -181,6 +546,9 @@
       
       input.value = "";
     });
+
+    // Initialize the page with saved settings
+    applySettings();
   </script>
 </body>
 </html>
