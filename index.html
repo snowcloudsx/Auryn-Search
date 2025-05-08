@@ -300,6 +300,29 @@
       
       <div class="setting-item">
         <div class="setting-label">
+          <span class="setting-name">Proxy Mode (MAY NOT WORK)</span>
+          <label class="switch">
+            <input type="checkbox" id="proxyToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <p class="setting-description">Replaces the google search with with a proxy</p>
+      </div>
+      
+
+      <div id="proxySelectorWrapper" style="display: none; margin-top: 10px;">
+        <label for="proxySelect" style="color: white;">Choose Proxy:</label>
+        <select id="proxySelect" style="margin-top: 5px; padding: 5px; border-radius: 5px;">
+          <option value="https://embeddr.rhw.one/embed#https://duckduckgo.com/?q=">Embeddr</option>
+          <option value=https://zkit.above.gay/embed#https://duckduckgo.com/?q=">Zkit Proxy</option>
+          <option value="https://proxy3.example.com/search?q=">Proxy 3</option>
+        </select>
+      </div>
+      
+
+
+      <div class="setting-item">
+        <div class="setting-label">
           <span class="setting-name">Custom Background</span>
           <label class="switch">
             <input type="checkbox" id="customBg">
@@ -358,6 +381,10 @@
     const suggestionsToggle = document.getElementById("suggestionsToggle");
     const historyToggle = document.getElementById("historyToggle");
     const blurToggle = document.getElementById("blurToggle");
+    const proxyToggle = document.getElementById("proxyToggle");
+    const proxySelectWrapper = document.getElementById("proxySelectorWrapper");
+    const proxySelect = document.getElementById("proxySelect");
+
 
     // Initialize settings from localStorage or defaults
     const settings = JSON.parse(localStorage.getItem("searchSettings")) || {
@@ -365,7 +392,8 @@
       suggestions: true,
       history: true,
       blur: true,
-      fakeGoogle: false
+      fakeGoogle: false,
+      proxy: false
     };
 
     // Apply settings on page load
@@ -386,7 +414,17 @@
       } else {
         logo.style.display = "none";
       }
+      
 
+
+      if (settings.proxy) {
+        proxyToggle.checked = true;
+        proxySelectWrapper.style.display = "block";
+      } else {
+        proxyToggle.checked = false;
+        proxySelectWrapper.style.display = "none";
+      }
+// Suggestions  
 
       // Suggestions
       suggestionsToggle.checked = settings.suggestions;
@@ -536,6 +574,13 @@
       }
     });
 
+    proxyToggle.addEventListener('change', function() {
+      settings.proxy = proxyToggle.checked;
+      localStorage.setItem("searchSettings", JSON.stringify(settings));
+      applySettings();
+    });
+
+
     historyToggle.addEventListener("change", function() {
       settings.history = this.checked;
       localStorage.setItem("searchSettings", JSON.stringify(settings));
@@ -592,10 +637,30 @@
         window.open(url, "_blank");
       } 
       else {
-        // Handle Google searches - open in new tab with search query
-        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(userInput)}`;
-        window.open(searchUrl, "_blank");
+        if (settings.proxy === true) {
+          const selectedProxy = proxySelect?.value;
+          const searchUrl = `${selectedProxy}${encodeURIComponent(userInput)}`;
+          const proxyTab = window.open("about:blank", "_blank");
+
+          if (proxyTab) {
+            proxyTab.document.write(`
+              <!DOCTYPE html>
+              <html>
+              <head><title>Proxy Search</title></head>
+              <body style="margin:0">
+                <iframe src="${searchUrl}" style="width:100vw;height:100vh;border:none;"></iframe>
+              </body>
+              </html>
+            `);
+            proxyTab.document.close();
+          }
+        } else {
+          // Handle Google searches - open in new tab with search query
+          const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(userInput)}`;
+          window.open(searchUrl, "_blank");
+        }
       }
+
       
       input.value = "";
     });
